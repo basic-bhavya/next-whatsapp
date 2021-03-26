@@ -67,7 +67,8 @@ function Sidebar() {
 
 export default Sidebar;
 
-const Container = styled.div``;
+const Container = styled.div`
+`;
 
 const Header = styled.div`
   display: flex;
@@ -78,7 +79,7 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  height: 18px;
+  height: 8vh;
   border-bottom: 1px solid whitesmoke;
 `;
 
