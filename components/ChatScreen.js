@@ -1,4 +1,4 @@
-import { Avatar, IconButton } from "@material-ui/core";
+import { Avatar, Grid, IconButton } from "@material-ui/core";
 import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -13,11 +13,21 @@ import { useState } from "react";
 import Message from "./Message";
 import getRecipientEmail from "../utils/getRecipientEmail";
 import TimeAgo from "timeago-react";
+import { useRef } from "react";
 
 function ChatScreen({ chat, messages }) {
   const [user] = useAuthState(auth);
   const router = useRouter();
   const [input, setInput] = useState("");
+  const endOfMessageRef = useRef(null);
+
+  const scrollToBottom = () => {
+    endOfMessageRef.current.scrollIntoView({
+      behaviour: "smooth",
+      block: "start",
+    });
+  };
+
   const [messagesSnapshot] = useCollection(
     db
       .collection("chats")
@@ -50,6 +60,7 @@ function ChatScreen({ chat, messages }) {
     });
 
     setInput("");
+    scrollToBottom();
   };
 
   const showMessages = () => {
@@ -82,21 +93,23 @@ function ChatScreen({ chat, messages }) {
         ) : (
           <Avatar>{recipientEmail[0]}</Avatar>
         )}
-        <HeaderInformation>
-          <h3>{recipientEmail}</h3>
-          {recipientSnapshot ? (
-            <p>
-              Last active:{" "}
-              {recipient?.lastSeen?.toDate() ? (
-                <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
-              ) : (
-                "Unavailable"
-              )}
-            </p>
-          ) : (
-            <p>Loading</p>
-          )}
-          <HeaderIcons>
+        <HeaderInformation container alignItems="center">
+          <Grid item xs={1} sm={9} md={10}>
+            <h3>{recipientEmail}</h3>
+            {recipientSnapshot ? (
+              <p>
+                Last active:{" "}
+                {recipient?.lastSeen?.toDate() ? (
+                  <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
+                ) : (
+                  "Unavailable"
+                )}
+              </p>
+            ) : (
+              <p>Loading</p>
+            )}
+          </Grid>
+          <HeaderIcons item>
             <IconButton>
               <AttachFileIcon />
             </IconButton>
@@ -108,7 +121,7 @@ function ChatScreen({ chat, messages }) {
       </Header>
       <MessageContainer>
         {showMessages()}
-        <EndOfMessage />
+        <EndOfMessage ref={endOfMessageRef} />
       </MessageContainer>
       <InputContainer>
         <InsertEmoticonIcon />
@@ -133,26 +146,28 @@ const Header = styled.div`
   top: 0;
   display: flex;
   padding: 11px;
-  height: 20vh;
+  height: 80px;
   align-items: center;
   border-bottom: 1px solid whitesmoke;
 `;
 
-const HeaderInformation = styled.div`
+// const HeaderInformation = styled.div`
+const HeaderInformation = styled(Grid)`
   margin-left: 15px;
   flex: 1;
 
-  > h3 {
+  h3 {
     margin-bottom: 3px;
   }
 
-  > p {
+  p {
     font-size: 14px;
     color: gray;
   }
 `;
 
-const HeaderIcons = styled.div``;
+// const HeaderIcons = styled.div`
+const HeaderIcons = styled(Grid)``;
 
 const MessageContainer = styled.div`
   padding: 30px;
@@ -160,7 +175,9 @@ const MessageContainer = styled.div`
   min-height: 90vh;
 `;
 
-const EndOfMessage = styled.div``;
+const EndOfMessage = styled.div`
+  margin-bottom: 50px;
+`;
 
 const InputContainer = styled.form`
   display: flex;
